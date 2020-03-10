@@ -1,18 +1,20 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <pan-zoom>
+      <img alt="Vue logo" src="./assets/logo.png" />
+      <img alt="Vue logo" src="./assets/logo.png" />
+    </pan-zoom>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import HelloWorld from "./components/HelloWorld.vue";
+import PanZoom from "./components/PanZoom.vue";
 
 export default Vue.extend({
   name: "App",
   components: {
-    HelloWorld
+    PanZoom
   }
 });
 </script>
