@@ -15,6 +15,12 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
+function getTouchDistance(e: TouchEvent) {
+  return Math.hypot(
+    e.touches[0].pageX - e.touches[1].pageX,
+    e.touches[0].pageY - e.touches[1].pageY
+  );
+}
 export default Vue.extend({
   props: {
     maxZoom: {
@@ -39,7 +45,8 @@ export default Vue.extend({
         zoom: 1
       },
       startX: 0,
-      startY: 0
+      startY: 0,
+      startZoom: 0
     };
   },
   methods: {
@@ -58,23 +65,40 @@ export default Vue.extend({
       window.addEventListener("mouseup", this.stopDrag);
     },
     touchStart(e: TouchEvent) {
-      this.dragging = true;
-      this.startX = e.touches[0].clientX - this.style.x;
-      this.startY = e.touches[0].clientY - this.style.y;
-      window.addEventListener("touchmove", this.touchMove);
-      window.addEventListener("touchend", this.stopDrag);
+      if (e.touches.length === 1) {
+        this.dragging = true;
+        this.startX = e.touches[0].clientX - this.style.x;
+        this.startY = e.touches[0].clientY - this.style.y;
+        window.addEventListener("touchmove", this.touchMove, {
+          passive: false
+        });
+      }
+      if (e.touches.length === 2) {
+        this.startZoom = getTouchDistance(e);
+        window.addEventListener("touchmove", this.pinch);
+      }
+      window.addEventListener("touchend", this.stopDrag, { passive: true });
+      e.preventDefault();
+    },
+    pinch(e: TouchEvent) {
+      const dist = getTouchDistance(e) - this.startZoom;
+      this.setZoom(this.style.zoom + dist);
+    },
+    touchMove(e: TouchEvent) {
+      this.drag(e.touches[0].clientX, e.touches[0].clientY);
+      e.preventDefault();
+      e.stopImmediatePropagation();
     },
     stopDrag() {
       this.dragging = false;
       window.removeEventListener("mousemove", this.mouseMove);
       window.removeEventListener("mouseup", this.stopDrag);
+      window.removeEventListener("touchmove", this.touchMove);
       window.removeEventListener("touchend", this.stopDrag);
+      window.removeEventListener("touchmove", this.pinch);
     },
     mouseMove(e: MouseEvent) {
       this.drag(e.clientX, e.clientY);
-    },
-    touchMove(e: TouchEvent) {
-      this.drag(e.touches[0].clientX, e.touches[0].clientY);
     },
     drag(x: number, y: number) {
       this.style.x = x - this.startX;
@@ -120,5 +144,6 @@ export default Vue.extend({
   position: relative;
   overflow: hidden;
   user-select: none;
+  touch-action: none;
 }
 </style>
