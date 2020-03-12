@@ -15,6 +15,10 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
+import Emulator from "hammer-touchemulator";
+if (process.env.NODE_ENV === "development") {
+  Emulator();
+}
 function getTouchDistance(e: TouchEvent) {
   return Math.hypot(
     e.touches[0].pageX - e.touches[1].pageX,
@@ -65,27 +69,25 @@ export default Vue.extend({
       window.addEventListener("mouseup", this.stopDrag);
     },
     touchStart(e: TouchEvent) {
-      if (e.touches.length === 1) {
-        this.dragging = true;
-        this.startX = e.touches[0].clientX - this.style.x;
-        this.startY = e.touches[0].clientY - this.style.y;
-        window.addEventListener("touchmove", this.touchMove, {
-          passive: false
-        });
-      }
-      if (e.touches.length === 2) {
-        this.startZoom = getTouchDistance(e);
-        window.addEventListener("touchmove", this.pinch);
-      }
+      this.dragging = true;
+      this.startX = e.touches[0].clientX - this.style.x;
+      this.startY = e.touches[0].clientY - this.style.y;
+      window.addEventListener("touchmove", this.touchMove, {
+        passive: false
+      });
       window.addEventListener("touchend", this.stopDrag, { passive: true });
       e.preventDefault();
     },
-    pinch(e: TouchEvent) {
-      const dist = getTouchDistance(e) - this.startZoom;
-      this.setZoom(this.style.zoom + dist);
-    },
     touchMove(e: TouchEvent) {
-      this.drag(e.touches[0].clientX, e.touches[0].clientY);
+      if (e.touches.length === 2) {
+        const dist = getTouchDistance(e);
+        const delta = dist - this.startZoom;
+        this.startZoom = dist;
+        this.setZoom(this.style.zoom + delta);
+      }
+      if (e.touches.length === 1) {
+        this.drag(e.touches[0].clientX, e.touches[0].clientY);
+      }
       e.preventDefault();
       e.stopImmediatePropagation();
     },
@@ -95,7 +97,6 @@ export default Vue.extend({
       window.removeEventListener("mouseup", this.stopDrag);
       window.removeEventListener("touchmove", this.touchMove);
       window.removeEventListener("touchend", this.stopDrag);
-      window.removeEventListener("touchmove", this.pinch);
     },
     mouseMove(e: MouseEvent) {
       this.drag(e.clientX, e.clientY);
