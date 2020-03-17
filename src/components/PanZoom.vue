@@ -60,9 +60,32 @@ export default Vue.extend({
 }
 </style>
 <docs>
+## Usage
+```ignore
+npm install @andi23rosca/vue-pan-zoom
+```
+
+Import and register it into any component you need to use 
+```ignore
+import PanZoom from "@andi23rosca/vue-pan-zoom";
+
+export default {
+  components: { PanZoom }
+}
+```
+
+See the example below on how to use it.
+
 ```vue
 <div style="height: 500px; width: 100%; background-color: #DDDDDD;"> 
   <pan-zoom>
+    <img src="/vue-pan-zoom/demo.jpg" style="width: 100%;"/>
+  </pan-zoom>
+</div>
+```
+```vue
+<div style="height: 500px; width: 100%; background-color: #DDDDDD;"> 
+  <pan-zoom :max-zoom="3" :min-zoom="0.5" :zoom-step="0.5">
     <img src="/vue-pan-zoom/demo.jpg" style="width: 100%;"/>
   </pan-zoom>
 </div>
