@@ -1,29 +1,10 @@
 # vue-pan-zoom
 
-## Project setup
-```
-npm install
-```
+Simple Vue component for panning and zooming any HTML/SVG content.
+Works with touchscreens.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Installation
 
-### Compiles and minifies for production
 ```
-npm run build
+npm install vue-pan-zom
 ```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
