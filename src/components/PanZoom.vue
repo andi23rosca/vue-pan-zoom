@@ -7,10 +7,6 @@
 </template>
 <script lang="ts">
 import Vue from "vue";
-import Emulator from "hammer-touchemulator";
-if (process.env.NODE_ENV === "development") {
-  Emulator();
-}
 import panZoom from "./panZoom";
 export default Vue.extend({
   props: {

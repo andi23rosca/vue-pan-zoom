@@ -88,7 +88,7 @@ export default function panZoom(
       setTransform(end0, zoom);
     }
   }
-  function mouseUp(e: MouseEvent) {
+  function mouseUp() {
     container.style.cursor = "grab";
     panning = false;
     window.removeEventListener("mousemove", mouseMove);
