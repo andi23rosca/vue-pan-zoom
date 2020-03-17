@@ -21,8 +21,11 @@ export default function panZoom(
   let endDist = 0;
 
   let zoom = 1;
+  let lastZoom = 1;
 
-  function setTransform(tr: Point, zoom = 1) {
+  let scaledSize = 0;
+
+  function setTransform(tr: Point, zoom: number) {
     cb(`translate(${tr.x}px, ${tr.y}px) scale(${zoom})`);
   }
   function setZoom(z: number) {
@@ -37,10 +40,10 @@ export default function panZoom(
       const finger0 = touchPoint(e, 0);
       const finger1 = touchPoint(e, 1);
       end0 = finger0.centerTo(finger1).subtract(start0);
-      endDist = finger0.distanceTo(finger1) - startDist;
-      const h = Math.hypot(content.offsetWidth, content.offsetHeight) * zoom;
-      const hd = endDist * 2 + h;
-      setZoom(hd / h);
+      endDist = finger0.distanceTo(finger1) * lastZoom - startDist;
+      const hd = endDist + scaledSize;
+      setZoom(lastZoom * (hd / scaledSize) ** 4);
+      // console.log(endDist, zoom);
       setTransform(end0, zoom);
     }
     e.preventDefault();
@@ -56,7 +59,10 @@ export default function panZoom(
       const finger0 = touchPoint(e, 0);
       const finger1 = touchPoint(e, 1);
       start0 = finger0.centerTo(finger1).subtract(end0);
-      startDist = finger0.distanceTo(finger1) - endDist;
+      lastZoom = zoom;
+      scaledSize =
+        Math.hypot(content.offsetWidth, content.offsetHeight) * lastZoom;
+      startDist = finger0.distanceTo(finger1) * lastZoom;
     }
     window.addEventListener("touchmove", touchMove);
     window.addEventListener("touchend", touchEnd);
