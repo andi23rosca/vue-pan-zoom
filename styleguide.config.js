@@ -13,5 +13,6 @@ module.exports = {
   //   // custom config goes here
   // },
   exampleMode: "expand",
-  usageMode: "expand"
+  usageMode: "expand",
+  styleguideDir: "docs"
 };
