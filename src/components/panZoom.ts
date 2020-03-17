@@ -3,14 +3,17 @@ import Point from "./Point";
 /* eslint-disable */
 const touchPoint = (e: TouchEvent, finger: number) =>
   new Point(e.touches[finger].clientX, e.touches[finger].clientY);
+const mousePoint = (e: MouseEvent) => new Point(e.clientX, e.clientY);
 
 export default function panZoom(
   container: HTMLElement,
   content: HTMLElement,
   minZoom: number,
   maxZoom: number,
+  zoomStep: number,
   cb: (tr: string) => any
 ) {
+  container.style.cursor = "grab";
   let panning = false;
   let zooming = false;
 
@@ -81,5 +84,37 @@ export default function panZoom(
     e.preventDefault();
   }
 
+  function mouseDown(e: MouseEvent) {
+    panning = true;
+    container.style.cursor = "grabbing";
+    start0 = mousePoint(e).subtract(end0);
+    window.addEventListener("mousemove", mouseMove);
+    window.addEventListener("mouseup", mouseUp);
+    e.preventDefault();
+  }
+  function mouseMove(e: MouseEvent) {
+    if (panning) {
+      end0 = mousePoint(e).subtract(start0);
+      setTransform(end0, zoom);
+    }
+  }
+  function mouseUp(e: MouseEvent) {
+    container.style.cursor = "grab";
+    panning = false;
+    window.removeEventListener("mousemove", mouseMove);
+    window.removeEventListener("mouseup", mouseUp);
+  }
+
+  function mouseWheel(e: WheelEvent) {
+    if (e.deltaY > 0) {
+      setZoom(zoom - zoomStep);
+    } else if (e.deltaY < 0) {
+      setZoom(zoom + zoomStep);
+    }
+    setTransform(end0, zoom);
+  }
+
   container.addEventListener("touchstart", touchStart);
+  container.addEventListener("mousedown", mouseDown);
+  container.addEventListener("wheel", mouseWheel);
 }
