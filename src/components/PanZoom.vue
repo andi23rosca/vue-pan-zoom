@@ -63,7 +63,7 @@ export default Vue.extend({
 ```vue
 <div style="height: 500px; width: 100%; background-color: #DDDDDD;"> 
   <pan-zoom>
-    <img src="/vue-pan-zoom/demo.jpg" style="width: 100%;"/>
+    <img src="/docs/vue-pan-zoom/demo.jpg" style="width: 100%;"/>
   </pan-zoom>
 </div>
 ```
