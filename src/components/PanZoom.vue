@@ -38,10 +38,7 @@ export default Vue.extend({
       this.$refs.content as HTMLElement,
       this.minZoom,
       this.maxZoom,
-      this.zoomStep,
-      tr => {
-        this.transform = tr;
-      }
+      this.zoomStep
     );
   }
   // data() {

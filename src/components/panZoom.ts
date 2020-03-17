@@ -1,6 +1,5 @@
 import Point from "./Point";
 
-/* eslint-disable */
 const touchPoint = (e: TouchEvent, finger: number) =>
   new Point(e.touches[finger].clientX, e.touches[finger].clientY);
 const mousePoint = (e: MouseEvent) => new Point(e.clientX, e.clientY);
@@ -10,8 +9,7 @@ export default function panZoom(
   content: HTMLElement,
   minZoom: number,
   maxZoom: number,
-  zoomStep: number,
-  cb: (tr: string) => any
+  zoomStep: number
 ) {
   container.style.cursor = "grab";
   let panning = false;
@@ -29,7 +27,7 @@ export default function panZoom(
   let scaledSize = 0;
 
   function setTransform(tr: Point, zoom: number) {
-    cb(`translate(${tr.x}px, ${tr.y}px) scale(${zoom})`);
+    content.style.transform = `translate(${tr.x}px, ${tr.y}px) scale(${zoom})`;
   }
   function setZoom(z: number) {
     zoom = z = Math.max(Math.min(z, maxZoom), minZoom);
@@ -48,6 +46,18 @@ export default function panZoom(
       setZoom(lastZoom * (hd / scaledSize) ** 4);
       // console.log(endDist, zoom);
       setTransform(end0, zoom);
+    }
+    e.preventDefault();
+  }
+  function touchEnd(e: TouchEvent) {
+    zooming = false;
+    if (e.touches.length === 1) {
+      panning = true;
+      start0 = touchPoint(e, 0).subtract(end0);
+    } else {
+      panning = false;
+      window.removeEventListener("touchmove", touchMove);
+      window.removeEventListener("touchend", touchEnd);
     }
     e.preventDefault();
   }
@@ -71,27 +81,7 @@ export default function panZoom(
     window.addEventListener("touchend", touchEnd);
     e.preventDefault();
   }
-  function touchEnd(e: TouchEvent) {
-    zooming = false;
-    if (e.touches.length === 1) {
-      panning = true;
-      start0 = touchPoint(e, 0).subtract(end0);
-    } else {
-      panning = false;
-      window.removeEventListener("touchmove", touchMove);
-      window.removeEventListener("touchend", touchEnd);
-    }
-    e.preventDefault();
-  }
 
-  function mouseDown(e: MouseEvent) {
-    panning = true;
-    container.style.cursor = "grabbing";
-    start0 = mousePoint(e).subtract(end0);
-    window.addEventListener("mousemove", mouseMove);
-    window.addEventListener("mouseup", mouseUp);
-    e.preventDefault();
-  }
   function mouseMove(e: MouseEvent) {
     if (panning) {
       end0 = mousePoint(e).subtract(start0);
@@ -103,6 +93,14 @@ export default function panZoom(
     panning = false;
     window.removeEventListener("mousemove", mouseMove);
     window.removeEventListener("mouseup", mouseUp);
+  }
+  function mouseDown(e: MouseEvent) {
+    panning = true;
+    container.style.cursor = "grabbing";
+    start0 = mousePoint(e).subtract(end0);
+    window.addEventListener("mousemove", mouseMove);
+    window.addEventListener("mouseup", mouseUp);
+    e.preventDefault();
   }
 
   function mouseWheel(e: WheelEvent) {
