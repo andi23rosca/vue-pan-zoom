@@ -110,6 +110,7 @@ export default function panZoom(
       setZoom(zoom + zoomStep);
     }
     setTransform(end0, zoom);
+    e.preventDefault();
   }
 
   container.addEventListener("touchstart", touchStart);
