@@ -1,73 +1,42 @@
-var PhoneGapReady = false;
-var jQueryReady = false;
-var panning = false;
-var zooming = false;
-var startX0;
-var startY0;
-var startX1;
-var startY1;
-var endX0;
-var endY0;
-var endX1;
-var endY1;
-var startDistanceBetweenFingers;
-var endDistanceBetweenFingers;
-var pinchRatio;
-var imgWidth = 200;
-var imgHeight = 300;
-var currentContinuousZoom = 1.0;
-var currentOffsetX = -100;
-var currentOffsetY = -100;
-var currentWidth = imgWidth;
-var currentHeight = imgHeight;
-var newContinuousZoom;
-var newHeight;
-var newWidth;
-var newOffsetX;
-var newOffsetY;
-var centerPointStartX;
-var centerPointStartY;
-var centerPointEndX;
-var centerPointEndY;
-var translateFromZoomingX;
-var translateFromZoomingY;
-var translateFromTranslatingX;
-var translateFromTranslatingY;
-var translateTotalX;
-var translateTotalY;
-var percentageOfImageAtPinchPointX;
-var percentageOfImageAtPinchPointY;
-var theImage;
-function onBodyLoad() {
-  document.addEventListener("deviceready", onDeviceReady, false);
-} /* If you are supporting your own protocol, the var invokeString will contain any arguments to the app launch.see http://iphonedevelopertips.com/cocoa/launching-your-own-application-via-a-custom-url-scheme.html
- for more details -jm */ /* When this function is called, PhoneGap has been initialized and is ready to roll */
-function onDeviceReady() {
-  PhoneGapReady = true;
-  if (jQueryReady == true) {
-    PhoneGapAndjQueryReady();
-  }
-}
-$(document).bind("mobileinit", function() {
-  // jQuery Mobile framework configuration changes
-  $.support.cors = true;
-  $.mobile.allowCrossDomainPages = true;
-  jQueryReady = true;
-  if (PhoneGapReady == true) {
-    PhoneGapAndjQueryReady();
-  }
-});
-function PhoneGapAndjQueryReady() {
-  theImage = document.getElementById("eiffelTower");
-  theImage.height = imgHeight;
-  theImage.width = imgWidth;
-  theImage.style.left = currentOffsetX + "px";
-  theImage.style.top = currentOffsetY + "px";
-  theImage.ontouchstart = touchStart;
-  theImage.ontouchmove = touchMove;
-  theImage.ontouchend = touchEnd;
-  theImage.ontouchcancel = touchCancel;
-}
+let panning = false;
+let zooming = false;
+let startX0;
+let startY0;
+let startX1;
+let startY1;
+let endX0;
+let endY0;
+let endX1;
+let endY1;
+let startDistanceBetweenFingers;
+let endDistanceBetweenFingers;
+let pinchRatio;
+const imgWidth = 200;
+const imgHeight = 300;
+let currentContinuousZoom = 1.0;
+let currentOffsetX = -100;
+let currentOffsetY = -100;
+let currentWidth = imgWidth;
+let currentHeight = imgHeight;
+let newContinuousZoom;
+let newHeight;
+let newWidth;
+let newOffsetX;
+let newOffsetY;
+let centerPointStartX;
+let centerPointStartY;
+let centerPointEndX;
+let centerPointEndY;
+let translateFromZoomingX;
+let translateFromZoomingY;
+let translateFromTranslatingX;
+let translateFromTranslatingY;
+let translateTotalX;
+let translateTotalY;
+let percentageOfImageAtPinchPointX;
+let percentageOfImageAtPinchPointY;
+let theImage;
+
 function touchStart(event) {
   panning = false;
   zooming = false;
@@ -95,7 +64,7 @@ function touchStart(event) {
 }
 function touchMove(event) {
   // This keeps touch events from moving the entire window.
-  event.preventDefault();
+  // event.preventDefault();
   if (panning) {
     endX0 = event.touches[0].pageX;
     endY0 = event.touches[0].pageY;
@@ -165,3 +134,14 @@ function touchCancel(event) {
     zooming = false;
   }
 }
+window.PhoneGapAndjQueryReady = function() {
+  theImage = document.getElementById("eiffelTower");
+  theImage.height = imgHeight;
+  theImage.width = imgWidth;
+  theImage.style.left = currentOffsetX + "px";
+  theImage.style.top = currentOffsetY + "px";
+  theImage.addEventListener("touchstart", touchStart);
+  theImage.addEventListener("touchmove", touchMove);
+  theImage.addEventListener("touchend", touchEnd);
+  theImage.addEventListener("touchcancel", touchCancel);
+};

@@ -1,6 +1,6 @@
 <template>
   <div class="container" ref="container">
-    <div ref="content" :style="`transform: ${transform}`">
+    <div class="content" ref="content">
       <slot />
     </div>
   </div>
@@ -16,20 +16,20 @@ export default Vue.extend({
   props: {
     maxZoom: {
       type: Number,
-      default: 5
+      default: 5,
     },
     minZoom: {
       type: Number,
-      default: 0.2
+      default: 0.2,
     },
     zoomStep: {
       type: Number,
-      default: 0.2
-    }
+      default: 0.2,
+    },
   },
   data() {
     return {
-      transform: ""
+      transform: "",
     };
   },
   mounted() {
@@ -37,8 +37,8 @@ export default Vue.extend({
     const setTransform = (tx: number, ty: number, s: number) => {
       this.transform = `translate(${tx}px, ${ty}px) scale(s)`;
     };
-    panzoom(container as HTMLElement, content as HTMLElement, setTransform);
-  }
+    panzoom(container as HTMLElement, content as HTMLElement);
+  },
 });
 </script>
 <style scoped>
@@ -49,5 +49,22 @@ export default Vue.extend({
   overflow: hidden;
   user-select: none;
   touch-action: none;
+  background: grey;
+}
+.content {
+  background-color: #efefef;
+  background-image: linear-gradient(#666 1px, transparent 1px),
+    linear-gradient(to right, #666 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+</style>
+<style>
+.rect {
+  width: 10px;
+  height: 10px;
+  position: absolute;
+  background: red;
+  top: 0;
+  left: 0;
 }
 </style>

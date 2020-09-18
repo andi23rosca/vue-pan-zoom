@@ -1,8 +1,9 @@
 <template>
   <div id="app">
     <pan-zoom>
-      <img alt="Vue logo" src="./assets/logo.png" />
-      <img alt="Vue logo" src="./assets/logo.png" />
+      <!-- <img alt="Vue logo" src="./assets/logo.png" />
+      <img alt="Vue logo" src="./assets/logo.png" /> -->
+      <div style="height: 300px;"></div>
     </pan-zoom>
   </div>
 </template>
@@ -14,8 +15,8 @@ import PanZoom from "./components/PanZoom.vue";
 export default Vue.extend({
   name: "App",
   components: {
-    PanZoom
-  }
+    PanZoom,
+  },
 });
 </script>
 
