@@ -55,7 +55,7 @@ export default Vue.extend({
   background-color: #efefef;
   background-image: linear-gradient(rgb(181, 189, 218) 1px, transparent 1px),
     linear-gradient(to right, rgb(181, 189, 218) 1px, transparent 1px);
-  background-size: 10px 10px;
+  background-size: 50px 50px;
 }
 </style>
 <style>
