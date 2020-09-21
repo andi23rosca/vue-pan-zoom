@@ -79,12 +79,6 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
   let origin = new Point(650, 400);
   let start = new Point(0, 0);
 
-  const cv = (x: number) => {
-    if (x >= 1 && x < 2) return (x % 1) / x;
-    if (x >= 2 || x > 0) return -1 / x + 1;
-    return 0;
-  };
-
   let zoom = 0.9;
   let zooming = zoom;
   let distance = 1;
@@ -99,10 +93,8 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
       const center = finger1.centerTo(finger2);
       mover = center;
       distancing = finger1.distanceTo(finger2);
-      // zooming = (distancing / distance) * zoom;
+      zooming = distancing / distance;
     }
-    // translate = translate.add(Point.origin());
-    // console.log(translate);
     translating = mover.subtract(start).add(translate);
 
     setTransform(translating, origin, zooming);
@@ -141,9 +133,6 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
     );
     translating = translate;
 
-    // console.log("translate", translate);
-    // console.log("origin", origin);
-    // console.log("start", start);
     setTransform(translate, origin, zoom);
     displayPoints(rcont, [origin]);
   }
