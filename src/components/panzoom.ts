@@ -79,12 +79,12 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
   let start = new Point(0, 0);
 
   const cv = (x: number) => {
-    if (x >= 2) return (x - 1) / x;
-    if (x > 1) return (x % 1) / x;
+    if (x >= 1 && x < 2) return (x % 1) / x;
+    if (x >= 2 || x > 0) return -1 / x + 1;
     return 0;
   };
 
-  const zoom = 1.2;
+  const zoom = 0.7;
   const initialZoom = zoom;
 
   function onTouchMove(e: TouchEvent) {
