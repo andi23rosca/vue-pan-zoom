@@ -75,6 +75,7 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
 
   let offset = Point.origin();
   let translate = new Point(100, 100);
+  let translating = translate;
   let origin = new Point(50, 50);
   let start = new Point(0, 0);
 
@@ -85,37 +86,34 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
   };
 
   const zoom = 0.7;
-  const initialZoom = zoom;
+  const zooming = zoom;
 
   function onTouchMove(e: TouchEvent) {
     const finger1 = Point.fromTouchEvent(e)
       .subtract(offset)
       .divideS(zoom);
-    let translating!: Point;
+    let mover = finger1;
 
     if (e.touches.length > 1) {
       const finger2 = Point.fromTouchEvent(e, 1)
         .subtract(offset)
         .divideS(zoom);
       const center = finger1.centerTo(finger2);
-
-      translating = center.subtract(start.multiplyS(initialZoom).divideS(zoom));
-
-      displayPoints(rcont, [finger1, finger2, center]);
-      return;
+      mover = center;
     }
-    translating = finger1.subtract(start.multiplyS(initialZoom).divideS(zoom));
+    translating = mover.subtract(start).add(translate);
 
     setTransform(translating, origin, zoom);
 
-    displayPoints(rcont, [finger1, origin]);
+    displayPoints(rcont, [mover, origin]);
   }
   function onTouchEnd() {
     document.removeEventListener("touchmove", onTouchMove);
     document.removeEventListener("touchend", onTouchEnd);
+    translate = translating;
   }
   function onTouchStart(e: TouchEvent) {
-    // document.addEventListener("touchmove", onTouchMove);
+    document.addEventListener("touchmove", onTouchMove);
     document.addEventListener("touchend", onTouchEnd);
 
     offset = Point.fromClientRect(content.getBoundingClientRect());
@@ -130,13 +128,14 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
       const center = finger1.centerTo(finger2);
       start = center;
       return;
+    } else {
+      start = finger1;
     }
-
-    start = finger1;
 
     const d = start.subtract(origin).multiplyS(cv(zoom));
     console.log(translate, origin, start, d);
     translate = translate.add(d);
+    translating = translate;
     origin = start;
 
     setTransform(translate, origin, zoom);
