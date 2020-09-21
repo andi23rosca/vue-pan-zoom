@@ -53,15 +53,15 @@ export default Vue.extend({
 }
 .content {
   background-color: #efefef;
-  background-image: linear-gradient(#666 1px, transparent 1px),
-    linear-gradient(to right, #666 1px, transparent 1px);
+  background-image: linear-gradient(rgb(181, 189, 218) 1px, transparent 1px),
+    linear-gradient(to right, rgb(181, 189, 218) 1px, transparent 1px);
   background-size: 10px 10px;
 }
 </style>
 <style>
 .rect {
-  width: 10px;
-  height: 10px;
+  width: 3px;
+  height: 3px;
   position: absolute;
   background: red;
   top: 0;

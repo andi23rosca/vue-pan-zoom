@@ -4,6 +4,7 @@ class Point {
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
+    Object.freeze(this);
   }
   add(p: Point) {
     return new Point(this.x + p.x, this.y + p.y);
@@ -49,77 +50,93 @@ class Point {
   }
 }
 
-export default function panzoom(
-  container: HTMLElement,
-  content: HTMLElement
-  // setTransform: (tx: number, ty: number, s: number) => void
-) {
-  let start = Point.origin();
-  let offset = Point.origin();
-  let translate = Point.origin();
-  let panningTranslation = Point.origin();
-  let origin = Point.origin();
-  let initialPinchScale = 0;
-  let pinchScale = 1;
+function displayPoints(cont: HTMLElement, points: Point[]) {
+  Array.from(cont.children).forEach((c) => {
+    cont.removeChild(c);
+  });
+  points.forEach((p) => {
+    const rect = document.createElement("div");
+    rect.classList.add("rect");
+    cont.appendChild(rect);
+    rect.style.top = p.y + "px";
+    rect.style.left = p.x + "px";
+  });
+}
 
-  const rect = document.createElement("div");
-  rect.classList.add("rect");
-  content.appendChild(rect);
+export default function panzoom(container: HTMLElement, content: HTMLElement) {
+  const rcont = document.createElement("div");
+  rcont.style.position = "relative";
+  content.prepend(rcont);
+
+  function setTransform(translate: Point, origin: Point, zoom: number) {
+    content.style.transformOrigin = `${origin.x}px ${origin.y}px`;
+    content.style.transform = `scale(${zoom}) translate(${translate.x}px, ${translate.y}px)`;
+  }
+
+  let offset = Point.origin();
+  let translate = new Point(100, 100);
+  let origin = new Point(50, 50);
+  let start = new Point(0, 0);
+
+  const zoom = 2;
+  const initialZoom = zoom;
 
   function onTouchMove(e: TouchEvent) {
-    const finger1 = Point.fromTouchEvent(e, 0)
-      .multiplyS(pinchScale)
-      .subtract(offset);
-    if (e.touches.length === 1) {
-      panningTranslation = finger1.subtract(start);
-    }
+    const finger1 = Point.fromTouchEvent(e)
+      .subtract(offset)
+      .divideS(zoom);
+    let translating!: Point;
+
     if (e.touches.length > 1) {
       const finger2 = Point.fromTouchEvent(e, 1)
-        .multiplyS(pinchScale)
-        .subtract(offset);
+        .subtract(offset)
+        .divideS(zoom);
       const center = finger1.centerTo(finger2);
-      panningTranslation = center.subtract(start);
-      pinchScale = finger1.distanceTo(finger2) / initialPinchScale;
-    }
 
-    panningTranslation = panningTranslation.add(translate);
-    content.style.transform = `translate(${panningTranslation.x}px, ${panningTranslation.y}px) scale(${pinchScale})`;
+      translating = center.subtract(start.multiplyS(initialZoom).divideS(zoom));
+
+      displayPoints(rcont, [finger1, finger2, center]);
+      return;
+    }
+    translating = finger1.subtract(start.multiplyS(initialZoom).divideS(zoom));
+
+    setTransform(translating, origin, zoom);
+
+    displayPoints(rcont, [finger1, origin]);
   }
-  function onTouchEnd(e: TouchEvent) {
+  function onTouchEnd() {
     document.removeEventListener("touchmove", onTouchMove);
     document.removeEventListener("touchend", onTouchEnd);
   }
   function onTouchStart(e: TouchEvent) {
-    const cr = content.getBoundingClientRect();
-    offset = Point.fromClientRect(cr);
+    // document.addEventListener("touchmove", onTouchMove);
+    document.addEventListener("touchend", onTouchEnd);
 
-    translate = panningTranslation;
-
-    const finger1 = Point.fromTouchEvent(e, 0)
-      .multiplyS(pinchScale)
-      .subtract(offset);
+    offset = Point.fromClientRect(content.getBoundingClientRect());
+    const finger1 = Point.fromTouchEvent(e)
+      .subtract(offset)
+      .divideS(zoom);
 
     if (e.touches.length > 1) {
       const finger2 = Point.fromTouchEvent(e, 1)
-        .multiplyS(pinchScale)
-        .subtract(offset);
-      start = finger1.centerTo(finger2);
-      initialPinchScale = finger1.distanceTo(finger2) / pinchScale;
-    } else {
-      start = finger1;
+        .subtract(offset)
+        .divideS(zoom);
+      const center = finger1.centerTo(finger2);
+      start = center;
+      return;
     }
+
+    start = finger1;
+
+    const d = start.subtract(origin).divideS(zoom);
+    translate = translate.add(d);
     origin = start;
 
-    // const wh = new Point(cr.width, cr.height);
-
-    content.style.transformOrigin = `${origin.x}px ${origin.y}px`;
-
-    rect.style.top = origin.y + "px";
-    rect.style.left = origin.x + "px";
-
-    document.addEventListener("touchmove", onTouchMove);
-    document.addEventListener("touchend", onTouchEnd);
+    setTransform(translate, origin, zoom);
+    displayPoints(rcont, [origin, start]);
   }
 
+  displayPoints(rcont, [translate, origin]);
+  setTransform(translate, origin, zoom);
   container.addEventListener("touchstart", onTouchStart);
 }

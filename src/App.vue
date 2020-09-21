@@ -3,7 +3,7 @@
     <pan-zoom>
       <!-- <img alt="Vue logo" src="./assets/logo.png" />
       <img alt="Vue logo" src="./assets/logo.png" /> -->
-      <div style="height: 300px;"></div>
+      <div style="height: 600px;"></div>
     </pan-zoom>
   </div>
 </template>
