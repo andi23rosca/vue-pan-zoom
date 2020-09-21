@@ -78,7 +78,13 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
   let origin = new Point(50, 50);
   let start = new Point(0, 0);
 
-  const zoom = 2;
+  const cv = (x: number) => {
+    if (x >= 2) return (x - 1) / x;
+    if (x > 1) return (x % 1) / x;
+    return 0;
+  };
+
+  const zoom = 1.2;
   const initialZoom = zoom;
 
   function onTouchMove(e: TouchEvent) {
@@ -128,7 +134,8 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
 
     start = finger1;
 
-    const d = start.subtract(origin).divideS(zoom);
+    const d = start.subtract(origin).multiplyS(cv(zoom));
+    console.log(translate, origin, start, d);
     translate = translate.add(d);
     origin = start;
 
