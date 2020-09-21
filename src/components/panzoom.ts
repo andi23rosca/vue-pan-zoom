@@ -105,7 +105,8 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
       distancing = finger1.distanceTo(finger2);
       zooming = (distancing / distance) * zoom;
     }
-    console.log(zooming);
+    // translate = translate.add(Point.origin());
+    // console.log(translate);
     translating = mover.subtract(start).add(translate);
 
     setTransform(translating, origin, zooming);
