@@ -50,23 +50,23 @@ class Point {
   }
 }
 
-function displayPoints(cont: HTMLElement, points: Point[]) {
-  Array.from(cont.children).forEach((c) => {
-    cont.removeChild(c);
-  });
-  points.forEach((p) => {
-    const rect = document.createElement("div");
-    rect.classList.add("rect");
-    cont.appendChild(rect);
-    rect.style.top = p.y + "px";
-    rect.style.left = p.x + "px";
-  });
-}
+// function displayPoints(cont: HTMLElement, points: Point[]) {
+//   Array.from(cont.children).forEach((c) => {
+//     cont.removeChild(c);
+//   });
+//   points.forEach((p) => {
+//     const rect = document.createElement("div");
+//     rect.classList.add("rect");
+//     cont.appendChild(rect);
+//     rect.style.top = p.y + "px";
+//     rect.style.left = p.x + "px";
+//   });
+// }
 
 export default function panzoom(container: HTMLElement, content: HTMLElement) {
-  const rcont = document.createElement("div");
-  rcont.style.position = "relative";
-  content.prepend(rcont);
+  // const rcont = document.createElement("div");
+  // rcont.style.position = "relative";
+  // content.prepend(rcont);
 
   function setTransform(translate: Point, origin: Point, zoom: number) {
     content.style.transformOrigin = `${origin.x}px ${origin.y}px`;
@@ -74,12 +74,12 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
   }
 
   let offset = Point.origin();
-  let translate = new Point(20, 20);
+  let translate = new Point(0, 0);
   let translating = translate;
-  let origin = new Point(650, 400);
+  let origin = new Point(0, 0);
   let start = new Point(0, 0);
 
-  let zoom = 0.9;
+  let zoom = 1;
   let zooming = zoom;
   let distance = 1;
   let distancing = distance;
@@ -98,7 +98,6 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
     translating = mover.subtract(start).add(translate);
 
     setTransform(translating, origin, zooming);
-    displayPoints(rcont, [origin]);
   }
   function onTouchEnd() {
     document.removeEventListener("touchmove", onTouchMove);
@@ -134,10 +133,8 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
     translating = translate;
 
     setTransform(translate, origin, zoom);
-    displayPoints(rcont, [origin]);
   }
 
-  displayPoints(rcont, [origin]);
   setTransform(translate, origin, zoom);
   container.addEventListener("touchstart", onTouchStart);
 }
