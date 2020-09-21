@@ -85,8 +85,10 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
     return 0;
   };
 
-  const zoom = 0.7;
-  const zooming = zoom;
+  let zoom = 0.7;
+  let zooming = zoom;
+  let distance = 1;
+  let distancing = distance;
 
   function onTouchMove(e: TouchEvent) {
     const finger1 = Point.fromTouchEvent(e)
@@ -100,17 +102,21 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
         .divideS(zoom);
       const center = finger1.centerTo(finger2);
       mover = center;
+      distancing = finger1.distanceTo(finger2);
+      zooming = (distancing / distance) * zoom;
     }
+    console.log(zooming);
     translating = mover.subtract(start).add(translate);
 
-    setTransform(translating, origin, zoom);
-
+    setTransform(translating, origin, zooming);
     displayPoints(rcont, [mover, origin]);
   }
   function onTouchEnd() {
     document.removeEventListener("touchmove", onTouchMove);
     document.removeEventListener("touchend", onTouchEnd);
     translate = translating;
+    zoom = zooming;
+    distance = distancing;
   }
   function onTouchStart(e: TouchEvent) {
     document.addEventListener("touchmove", onTouchMove);
@@ -127,6 +133,7 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
         .divideS(zoom);
       const center = finger1.centerTo(finger2);
       start = center;
+      distance = finger1.distanceTo(finger2);
       return;
     } else {
       start = finger1;
@@ -136,6 +143,8 @@ export default function panzoom(container: HTMLElement, content: HTMLElement) {
     console.log(translate, origin, start, d);
     translate = translate.add(d);
     translating = translate;
+    zooming = zoom;
+    distancing = distance;
     origin = start;
 
     setTransform(translate, origin, zoom);
