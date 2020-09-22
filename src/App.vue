@@ -3,7 +3,7 @@
     <pan-zoom>
       <!-- <img alt="Vue logo" src="./assets/logo.png" />
       <img alt="Vue logo" src="./assets/logo.png" /> -->
-      <div style="height: 600px;"></div>
+      <div class="content" style="height: 600px;"></div>
     </pan-zoom>
   </div>
 </template>
@@ -28,5 +28,11 @@ export default Vue.extend({
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.content {
+  background-color: #efefef;
+  background-image: linear-gradient(rgb(181, 189, 218) 1px, transparent 1px),
+    linear-gradient(to right, rgb(181, 189, 218) 1px, transparent 1px);
+  background-size: 50px 50px;
 }
 </style>

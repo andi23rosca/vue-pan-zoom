@@ -5,7 +5,7 @@
     @mousewheel.prevent="mouseWheel"
     @mousedown="mouseDown"
   >
-    <div class="content" ref="content" :style="style">
+    <div ref="content" :style="style">
       <slot />
     </div>
   </div>
@@ -169,12 +169,6 @@ export default Vue.extend({
   user-select: none;
   touch-action: none;
   background: grey;
-}
-.content {
-  background-color: #efefef;
-  background-image: linear-gradient(rgb(181, 189, 218) 1px, transparent 1px),
-    linear-gradient(to right, rgb(181, 189, 218) 1px, transparent 1px);
-  background-size: 50px 50px;
 }
 </style>
 <style>
