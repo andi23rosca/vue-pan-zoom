@@ -1,5 +1,10 @@
 <template>
-  <div class="container" ref="container" @mousewheel.prevent="mouseWheel">
+  <div
+    class="container"
+    ref="container"
+    @mousewheel.prevent="mouseWheel"
+    @mousedown="mouseDown"
+  >
     <div class="content" ref="content" :style="style">
       <slot />
     </div>
@@ -56,24 +61,11 @@ export default Vue.extend({
         transform: `translate(${translate.x}px, ${translate.y}px) scale(${zoom})`,
       };
     },
-    touchStart(e: TouchEvent) {
-      document.addEventListener("touchmove", this.touchMove);
-      document.addEventListener("touchend", this.touchEnd);
+    panStart(p: Point) {
       this.contentOffset = Point.fromClientRect(
         (this.$refs.content as HTMLElement).getBoundingClientRect()
       );
-      const finger1 = Point.fromTouchEvent(e).subtract(this.contentOffset);
-
-      if (e.touches.length > 1) {
-        const finger2 = Point.fromTouchEvent(e, 1).subtract(this.contentOffset);
-        const center = finger1.centerTo(finger2);
-        this.start = center;
-        this.distance = finger1.distanceTo(finger2) / this.zoom;
-        return;
-      } else {
-        this.start = finger1;
-      }
-
+      this.start = p.subtract(this.contentOffset);
       const pOrigin = this.origin;
       this.zooming = this.zoom;
       this.distancing = this.distance;
@@ -82,29 +74,64 @@ export default Vue.extend({
         this.origin.subtract(pOrigin).multiplyS(1 - this.zoom)
       );
       this.translating = this.translate;
-      this.setTransform(this.translate, this.origin, this.zoom);
     },
-    touchMove(e: TouchEvent) {
-      const finger1 = Point.fromTouchEvent(e).subtract(this.contentOffset);
+    panMove(p: Point) {
+      this.translating = p
+        .subtract(this.contentOffset)
+        .subtract(this.start)
+        .add(this.translate);
+    },
+    panFinish() {
+      this.translate = this.translating;
+      this.zoom = this.zooming;
+      this.distance = this.distancing;
+    },
+    touchStart(e: TouchEvent) {
+      document.addEventListener("touchmove", this.touchMove);
+      document.addEventListener("touchend", this.touchEnd);
+
+      const finger1 = Point.fromTouchEvent(e);
       let mover = finger1;
 
       if (e.touches.length > 1) {
-        const finger2 = Point.fromTouchEvent(e, 1).subtract(this.contentOffset);
-        const center = finger1.centerTo(finger2);
-        mover = center;
+        const finger2 = Point.fromTouchEvent(e, 1);
+        mover = finger1.centerTo(finger2);
+        this.distance = finger1.distanceTo(finger2) / this.zoom;
+      }
+      this.panStart(mover);
+      this.setTransform(this.translate, this.origin, this.zoom);
+    },
+    touchMove(e: TouchEvent) {
+      const finger1 = Point.fromTouchEvent(e);
+      let mover = finger1;
+      if (e.touches.length > 1) {
+        const finger2 = Point.fromTouchEvent(e, 1);
+        mover = finger1.centerTo(finger2);
         this.distancing = finger1.distanceTo(finger2);
         this.zooming = this.distancing / this.distance;
       }
-      this.translating = mover.subtract(this.start).add(this.translate);
-
+      this.panMove(mover);
       this.setTransform(this.translating, this.origin, this.zooming);
     },
     touchEnd() {
       document.removeEventListener("touchmove", this.touchMove);
       document.removeEventListener("touchend", this.touchEnd);
-      this.translate = this.translating;
-      this.zoom = this.zooming;
-      this.distance = this.distancing;
+      this.panFinish();
+    },
+    mouseDown(e: MouseEvent) {
+      document.addEventListener("mousemove", this.mouseMove);
+      document.addEventListener("mouseup", this.mouseUp);
+      this.panStart(Point.fromMouseEvent(e));
+      this.setTransform(this.translate, this.origin, this.zoom);
+    },
+    mouseMove(e: MouseEvent) {
+      this.panMove(Point.fromMouseEvent(e));
+      this.setTransform(this.translating, this.origin, this.zooming);
+    },
+    mouseUp() {
+      document.removeEventListener("mousemove", this.mouseMove);
+      document.removeEventListener("mouseup", this.mouseUp);
+      this.panFinish();
     },
     mouseWheel(e: MouseWheelEvent) {
       if (e.ctrlKey || !this.isMac) {
@@ -127,7 +154,8 @@ export default Vue.extend({
         this.translating = this.translate;
       }
       this.setTransform(this.translate, this.origin, this.zoom);
-      console.log(e);
+      this.panFinish();
+      // console.log(e);
     },
   },
 });
