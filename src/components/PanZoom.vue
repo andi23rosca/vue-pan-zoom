@@ -40,8 +40,8 @@ export default Vue.extend({
       contentOffset: Point.origin(),
       start: Point.origin(),
       zoom: 1,
+      innerZoom: 1,
       distance: 1,
-      zooming: 1,
       distancing: 1,
       style: {
         transformOrigin: ``,
@@ -49,6 +49,16 @@ export default Vue.extend({
       },
       isMac: navigator.platform.toUpperCase().indexOf("MAC") >= 0,
     };
+  },
+  computed: {
+    zooming: {
+      get(): number {
+        return this.innerZoom;
+      },
+      set(value: number) {
+        this.innerZoom = Math.max(this.minZoom, Math.min(this.maxZoom, value));
+      },
+    },
   },
   mounted() {
     const { container } = this.$refs;
